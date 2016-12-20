@@ -20,18 +20,30 @@ class WorldRenderer:
         self.world = world
         self.width = width
         self.height = height
- 
-        self.background = arcade.Sprite('asset/b1.png')
-        self.background.set_position(400, 300)
 
-        self.star_sprite = ModelSprite('asset/s'+(str)(1)+'.png',model=self.world.star)
-        self.star_sprite2 = ModelSprite('asset/s'+(str)(1)+'.png',model=self.world.star2)
-        self.star_sprite3 = ModelSprite('asset/s'+(str)(1)+'.png',model=self.world.star3)
-        self.star_sprite4 = ModelSprite('asset/s'+(str)(1)+'.png',model=self.world.star4)
+        self.set_asset()
 
     def draw(self):
-        self.background.draw()
-        self.star_sprite.draw()
-        self.star_sprite2.draw()
-        self.star_sprite3.draw()
-        self.star_sprite4.draw()
+        if self.world.state == 1:
+            self.background[0].draw()
+        if self.world.state == 2:
+            self.background[1].draw()
+        if self.world.state == 3:
+            self.background[2].draw()
+        if self.world.state == 4:
+            self.background[3].draw()
+
+        for i in range(4):
+            self.star_sprite[i].draw()
+            arcade.draw_text(str(i+10), self.star_sprite[i].model.x, self.star_sprite[i].model.y, arcade.color.BLACK, font_size=40, bold=True, align="center", anchor_x="center", anchor_y="center")
+
+    def set_asset(self):
+        self.background = []
+
+        for i in range(4):
+            self.background.append(arcade.Sprite('asset/b'+(str)(i+1)+'.png'))
+            self.background[i].set_position(400, 300)
+
+        self.star_sprite = []
+        for i in range(4):
+            self.star_sprite.append(ModelSprite('asset/s'+(str)(i+8)+'.png',model=self.world.star[i]))

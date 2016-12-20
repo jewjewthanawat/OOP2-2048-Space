@@ -17,7 +17,10 @@ class GameWindow(arcade.Window):
         self.world_renderer.draw()
 
     def animate(self, delta):
-        self.world.animate(delta) 
+        self.world.animate(delta)
+
+    def on_key_press(self, key, key_modifiers):
+        self.world.on_key_press(key, key_modifiers)
  
 if __name__ == '__main__':
     window = GameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
