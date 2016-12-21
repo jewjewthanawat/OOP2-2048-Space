@@ -1,20 +1,6 @@
 import arcade
 from world import World
 
-class ModelSprite(arcade.Sprite):
-    def __init__(self, *args, **kwargs):
-        self.model = kwargs.pop('model', None)
- 
-        super().__init__(*args, **kwargs)
- 
-    def sync_with_model(self):
-        if self.model:
-            self.set_position(self.model.x, self.model.y)
- 
-    def draw(self):
-        self.sync_with_model()
-        super().draw()
-
 class WorldRenderer:
     def __init__(self, world, width, height):
         self.world = world
@@ -24,18 +10,20 @@ class WorldRenderer:
         self.set_asset()
 
     def draw(self):
-        if self.world.state == 1:
+        if self.world.max <= 1024:
             self.background[0].draw()
-        if self.world.state == 2:
+        if self.world.max <= 2048:
             self.background[1].draw()
-        if self.world.state == 3:
+        if self.world.max <= 4096:
             self.background[2].draw()
-        if self.world.state == 4:
+        if self.world.max > 4096:
             self.background[3].draw()
 
-        for i in range(4):
-            self.star_sprite[i].draw()
-            arcade.draw_text(str(i+10), self.star_sprite[i].model.x, self.star_sprite[i].model.y, arcade.color.BLACK, font_size=40, bold=True, align="center", anchor_x="center", anchor_y="center")
+        for i in range(len(self.world.star)):
+            for j in range(len(self.world.star[i])):
+                if self.world.star[i][j] != 0 :
+                    arcade.draw_texture_rectangle(self.world.star[i][j].x, self.world.star[i][j].y, self.star_texture[self.world.star[i][j].value].width, self.star_texture[self.world.star[i][j].value].height, self.star_texture[self.world.star[i][j].value], 0)
+                    arcade.draw_text(str(self.world.star[i][j].value), self.world.star[i][j].x, self.world.star[i][j].y, arcade.color.BLACK, font_size=40, bold=True, align="center", anchor_x="center", anchor_y="center")
 
     def set_asset(self):
         self.background = []
@@ -44,6 +32,8 @@ class WorldRenderer:
             self.background.append(arcade.Sprite('asset/b'+(str)(i+1)+'.png'))
             self.background[i].set_position(400, 300)
 
-        self.star_sprite = []
-        for i in range(4):
-            self.star_sprite.append(ModelSprite('asset/s'+(str)(i+8)+'.png',model=self.world.star[i]))
+        self.star_texture = {}
+        for i in range(12):
+            self.star_texture[2**(i+1)] = arcade.load_texture('asset/s'+(str)(i+1)+'.png')
+        for i in range(12,17):    
+            self.star_texture[2**(i+1)] = arcade.load_texture('asset/s12.png')
