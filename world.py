@@ -9,6 +9,7 @@ class World:
         self.n = 4
         self.state = 0
         self.star = []
+        self.black_hole = BlackHole()
         self.blank_cell = []
         self.all_star = []
         self.new_game()
@@ -22,6 +23,7 @@ class World:
         self.check_blank_cell()
         self.random = 0      
         self.max = 0
+        self.count = 0
 
     def on_key_press(self, key, key_modifiers):
         if self.state == 0: #new game
@@ -31,6 +33,7 @@ class World:
                 self.state = 1
         if self.state == 2: #ready to input
             if key == arcade.key.UP and self.can_move_up():
+                self.count += 1
                 for i in range(self.n):
                     self.checking_cell = 0
                     self.checking_cell_value = 0
@@ -52,6 +55,7 @@ class World:
                                 self.checking_cell_value = self.star[j][i].value
                 self.state = 3
             elif key == arcade.key.DOWN and self.can_move_down():
+                self.count += 1
                 for i in range(self.n):
                     self.checking_cell = self.n-1
                     self.checking_cell_value = 0
@@ -73,6 +77,7 @@ class World:
                                 self.checking_cell_value = self.star[self.n-1-j][i].value
                 self.state = 4
             elif key == arcade.key.LEFT and self.can_move_left():
+                self.count += 1
                 for i in range(self.n):
                     self.checking_cell = 0
                     self.checking_cell_value = 0
@@ -94,6 +99,7 @@ class World:
                                 self.checking_cell_value = self.star[i][j].value
                 self.state = 5
             elif key == arcade.key.RIGHT and self.can_move_right():
+                self.count += 1
                 for i in range(self.n):
                     self.checking_cell = self.n-1
                     self.checking_cell_value = 0
@@ -118,8 +124,27 @@ class World:
     def animate(self, delta):
         if self.state == 1: #gen star
             self.random = randint(0,len(self.blank_cell)-1)
-            self.star[math.floor(self.blank_cell[self.random]/self.n)][self.blank_cell[self.random]%self.n] = Star((4/self.n)*(105+150*(self.blank_cell[self.random]%self.n)),(4/self.n)*(555-150*math.floor(self.blank_cell[self.random]/self.n)))
+            self.star[math.floor(self.blank_cell[self.random]/self.n)][self.blank_cell[self.random]%self.n] = Star(105+150*(self.blank_cell[self.random]%self.n), 555-150*math.floor(self.blank_cell[self.random]/self.n))
             self.check_blank_cell()
+            if self.count % 6 == 0 and self.count != 0:
+                self.black_hole.appear = True
+                self.black_hole.type = randint(0,1)
+                self.black_hole_range = [0,1,2,3]
+                if self.black_hole.type == 0:
+                    self.black_hole.x1 = randint(0,4)
+                    self.black_hole.x2 = randint(0,4)
+                    self.black_hole.y1 = randint(0,3)
+                    self.black_hole_range.remove(self.black_hole.y1)
+                    self.black_hole.y2 = self.black_hole_range[randint(0,2)]
+                else:
+                    self.black_hole.x1 = randint(0,3)
+                    self.black_hole_range.remove(self.black_hole.x1)
+                    self.black_hole.x2 = self.black_hole_range[randint(0,2)]
+                    self.black_hole.y1 = randint(0,4)
+                    self.black_hole.y2 = randint(0,4)
+                self.black_hole.set_position()
+            else:
+                self.black_hole.appear = False
             if self.is_end():
                 self.state = 0
             else:
@@ -249,6 +274,8 @@ class World:
             for l in range(self.n):
                 if self.star[k][l] != 0 and (k != i or l != j) and self.star[k][l].x == self.star[i][j].x and self.star[k][l].y == self.star[i][j].y:
                     self.star[i][j].value *= 2
+                    if self.star[i][j].value > self.max:
+                        self.max = self.star[i][j].value
                     self.star[k][l] = 0
                     return
                     
@@ -277,3 +304,28 @@ class Star:
 
     def set_target_y(self, cell):
         self.target = 555-150*cell
+
+class BlackHole:
+    def __init__(self):
+        self.appear = False
+        self.type = 0
+        self.x1 = 0
+        self.x2 = 0
+        self.y1 = 0
+        self.y2 = 0
+        self.real_x1 = 0
+        self.real_x2 = 0
+        self.real_y1 = 0
+        self.real_y2 = 0
+
+    def set_position(self):
+        if self.type == 0:
+            self.real_x1 = 30+150*self.x1
+            self.real_x2 = 30+150*self.x2
+            self.real_y1 = 555-150*self.y1
+            self.real_y2 = 555-150*self.y2
+        else:
+            self.real_x1 = 105+150*self.x1
+            self.real_x2 = 105+150*self.x2
+            self.real_y1 = 630-150*self.y1
+            self.real_y2 = 630-150*self.y2

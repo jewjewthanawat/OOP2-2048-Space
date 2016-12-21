@@ -10,13 +10,13 @@ class WorldRenderer:
         self.set_asset()
 
     def draw(self):
-        if self.world.max <= 1024:
+        if self.world.max <= 512:
             self.background[0].draw()
-        elif self.world.max <= 2048:
+        elif self.world.max <= 1024:
             self.background[1].draw()
-        elif self.world.max <= 4096:
+        elif self.world.max <= 2048:
             self.background[2].draw()
-        elif self.world.max > 4096:
+        else:
             self.background[3].draw()
 
         for i in range(len(self.world.star)):
@@ -24,7 +24,10 @@ class WorldRenderer:
                 if self.world.star[i][j] != 0 :
                     arcade.draw_texture_rectangle(self.world.star[i][j].x, self.world.star[i][j].y, self.star_texture[self.world.star[i][j].value].width, self.star_texture[self.world.star[i][j].value].height, self.star_texture[self.world.star[i][j].value], 0)
                     #arcade.draw_text(str(self.world.star[i][j].value), self.world.star[i][j].x, self.world.star[i][j].y, arcade.color.BLACK, font_size=40, bold=True, align="center", anchor_x="center", anchor_y="center")
-
+        if self.world.black_hole.appear:
+            arcade.draw_texture_rectangle(self.world.black_hole.real_x1, self.world.black_hole.real_y1, self.item_texture[self.world.black_hole.type].width, self.item_texture[self.world.black_hole.type].height, self.item_texture[self.world.black_hole.type], 0)
+            arcade.draw_texture_rectangle(self.world.black_hole.real_x2, self.world.black_hole.real_y2, self.item_texture[self.world.black_hole.type].width, self.item_texture[self.world.black_hole.type].height, self.item_texture[self.world.black_hole.type], 0)
+            
     def set_asset(self):
         self.background = []
 
