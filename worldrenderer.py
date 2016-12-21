@@ -30,10 +30,14 @@ class WorldRenderer:
 
         for i in range(4):
             self.background.append(arcade.Sprite('asset/b'+(str)(i+1)+'.png'))
-            self.background[i].set_position(400, 300)
+            self.background[i].set_position(400, 330)
 
         self.star_texture = {}
         for i in range(17):
             self.star_texture[2**(i+1)] = arcade.load_texture('asset/s'+(str)(i+1)+'.png')
         #for i in range(12,17):    
         #    self.star_texture[2**(i+1)] = arcade.load_texture('asset/s12.png')
+
+        self.item_texture = {}
+        for i in range(7):
+            self.item_texture[i] = arcade.load_texture('asset/h'+(str)(i)+'.png')

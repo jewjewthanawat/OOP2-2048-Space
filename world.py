@@ -118,7 +118,7 @@ class World:
     def animate(self, delta):
         if self.state == 1: #gen star
             self.random = randint(0,len(self.blank_cell)-1)
-            self.star[math.floor(self.blank_cell[self.random]/self.n)][self.blank_cell[self.random]%self.n] = Star((4/self.n)*(75+150*(self.blank_cell[self.random]%self.n)),(4/self.n)*(525-150*math.floor(self.blank_cell[self.random]/self.n)))
+            self.star[math.floor(self.blank_cell[self.random]/self.n)][self.blank_cell[self.random]%self.n] = Star((4/self.n)*(105+150*(self.blank_cell[self.random]%self.n)),(4/self.n)*(555-150*math.floor(self.blank_cell[self.random]/self.n)))
             self.check_blank_cell()
             if self.is_end():
                 self.state = 0
@@ -240,7 +240,7 @@ class World:
                     self.star[i][j] = 0
                     del self.for_del
         for i in range(len(self.all_star)):
-            self.star[(int)((525 - self.all_star[i].y)/150)][(int)((self.all_star[i].x - 75)/150)] = self.all_star[i]
+            self.star[(int)((555 - self.all_star[i].y)/150)][(int)((self.all_star[i].x - 105)/150)] = self.all_star[i]
         self.check_blank_cell()
         self.state = 1
 
@@ -273,7 +273,7 @@ class Star:
         self.v = (self.target - self.y)/5
 
     def set_target_x(self, cell):
-        self.target = 75+150*cell
+        self.target = 105+150*cell
 
     def set_target_y(self, cell):
-        self.target = 525-150*cell
+        self.target = 555-150*cell

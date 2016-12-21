@@ -3,7 +3,7 @@ from world import World
 from worldrenderer import WorldRenderer
  
 SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 660
 
 class GameWindow(arcade.Window):
     def __init__(self, width, height):
