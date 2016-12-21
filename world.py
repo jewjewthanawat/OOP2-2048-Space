@@ -8,10 +8,13 @@ class World:
         self.height = height
         self.n = 4
         self.state = 0
+        self.star = []
+        self.blank_cell = []
+        self.all_star = []
         self.new_game()
 
     def new_game(self):
-        self.star = []
+        self.star.clear()
         for i in range(self.n):
             self.star.append([])
             for j in range(self.n):
@@ -164,7 +167,7 @@ class World:
                         
 
     def check_blank_cell(self):
-        self.blank_cell = []
+        self.blank_cell.clear()
         for i in range(self.n):
             for j in range(self.n):
                 if self.star[i][j] == 0:
@@ -228,7 +231,7 @@ class World:
             for j in range(self.n):
                 if self.star[i][j] != 0:
                     self.merge_cell(i, j)
-        self.all_star = []
+        self.all_star.clear()
         for i in range(self.n):
             for j in range(self.n):
                 if self.star[i][j] != 0:
