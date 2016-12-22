@@ -8,13 +8,14 @@ class World:
         self.width = width
         self.height = height
         self.n = 4
-        self.state = 0
+        self.state = -1
+        self.tutorial = False
+        self.max = 2049
         self.star = []
         self.black_hole = BlackHole()
         self.star_cell = []
         self.blank_cell = []
         self.all_star = []
-        self.new_game()
 
     def new_game(self):
         self.star.clear()
@@ -23,7 +24,10 @@ class World:
             for j in range(self.n):
                 self.star[i].append(0)
         self.check_blank_cell()
-        self.random = 0      
+        self.random = 0
+        self.score = 0
+        self.last_score0 = 0
+        self.last_score1 = 0
         self.max = 0
         self.count = 0
         self.lock_x = 0
@@ -31,10 +35,26 @@ class World:
         self.sun = False
 
     def on_key_press(self, key, key_modifiers):
-        if self.state == 0: #new game
+        if self.state == -1: #first page
             if key == arcade.key.SPACE:
+                self.tutorial = False
                 self.new_game()
                 self.state = 1
+            elif key == arcade.key.H:
+                if self.tutorial:
+                    self.tutorial = False
+                else:
+                    self.tutorial = True
+        if self.state == 0: #end game
+            if key == arcade.key.SPACE:
+                self.tutorial = False
+                self.new_game()
+                self.state = 1
+            elif key == arcade.key.H:
+                if self.tutorial:
+                    self.tutorial = False
+                else:
+                    self.tutorial = True
         if self.state == 2: #ready to input
             if key == arcade.key.UP and self.can_move_up():
                 for i in range(self.n):
@@ -305,12 +325,16 @@ class World:
                                     self.checking_cell_value = self.star[i][self.n-1-j].value
                 self.state = 6
             elif key == arcade.key.NUM_0:
-                self.sun = True
+                if (self.score - self.last_score0)/math.log2(self.max) >= 100:
+                    self.last_score0 = self.score
+                    self.sun = True
             elif key == arcade.key.NUM_1:
-                for i in range(self.n):
-                    for j in range(self.n):
-                        if self.star[i][j] != 0 and self.star[i][j].value > 0:
-                            self.star[i][j].charge = True
+                if (self.score - self.last_score1)/math.log2(self.max) >= 100:
+                    self.last_score1 = self.score
+                    for i in range(self.n):
+                        for j in range(self.n):
+                            if self.star[i][j] != 0 and self.star[i][j].value > 0:
+                                self.star[i][j].charge = True
  
     def animate(self, delta):
         if self.state == 1: #gen star
@@ -367,9 +391,13 @@ class World:
                         del self.for_del
                         for k in range(self.n):
                             if self.star[i][k] != 0 and self.star[i][k].value > 0:
-                                self.star[i][k].value *= 2
+                                if self.star[i][k].value < 131072:
+                                    self.star[i][k].value *= 2
+                                self.score += (int)(math.log2(self.max)*self.star[i][k].value/4)
                             if self.star[k][j] != 0 and self.star[k][j].value > 0:
-                                self.star[k][j].value *= 2
+                                if self.star[k][j].value < 131072:
+                                    self.star[k][j].value *= 2
+                                self.score += (int)(math.log2(self.max)*self.star[k][j].value/4)
             self.check_max()
             self.check_blank_cell()
             if self.is_end():
@@ -440,9 +468,9 @@ class World:
             return True
         for i in range(self.n-1):
             for j in range(self.n):
-                if self.star[self.n-1-i-1][j] == 0 and self.star[self.n-1-i][j] != 0:
+                if self.star[self.n-1-i-1][j] == 0 and self.star[self.n-1-i][j] != 0 and (not self.star[self.n-1-i][j].lock):
                     return True
-                if self.star[self.n-1-i][j] != 0 and self.star[self.n-1-i-1][j] != 0 and self.star[self.n-1-i][j].value == self.star[self.n-1-i-1][j].value:
+                if self.star[self.n-1-i][j] != 0 and self.star[self.n-1-i-1][j] != 0 and self.star[self.n-1-i][j].value == self.star[self.n-1-i-1][j].value and (not self.star[self.n-1-i][j].lock):
                     return True
         return False
 
@@ -451,9 +479,9 @@ class World:
             return True
         for i in range(self.n-1):
             for j in range(self.n):
-                if self.star[i+1][j] == 0 and self.star[i][j] != 0:
+                if self.star[i+1][j] == 0 and self.star[i][j] != 0 and (not self.star[i][j].lock):
                     return True
-                if self.star[i][j] != 0 and self.star[i+1][j] != 0 and self.star[i][j].value == self.star[i+1][j].value:
+                if self.star[i][j] != 0 and self.star[i+1][j] != 0 and self.star[i][j].value == self.star[i+1][j].value and (not self.star[i][j].lock):
                     return True
         return False
 
@@ -462,9 +490,9 @@ class World:
             return True
         for i in range(self.n-1):
             for j in range(self.n):
-                if self.star[j][i] == 0 and self.star[j][i+1] != 0:
+                if self.star[j][i] == 0 and self.star[j][i+1] != 0 and (not self.star[j][i+1].lock):
                     return True
-                if self.star[j][i] != 0 and self.star[j][i+1] != 0 and self.star[j][i].value == self.star[j][i+1].value:
+                if self.star[j][i] != 0 and self.star[j][i+1] != 0 and self.star[j][i].value == self.star[j][i+1].value and (not self.star[j][i+1].lock):
                     return True
         return False
 
@@ -473,9 +501,9 @@ class World:
             return True
         for i in range(self.n-1):
             for j in range(self.n):
-                if self.star[j][self.n-1-i] == 0 and self.star[j][self.n-1-i-1] != 0:
+                if self.star[j][self.n-1-i] == 0 and self.star[j][self.n-1-i-1] != 0 and (not self.star[j][self.n-1-i-1].lock):
                     return True
-                if self.star[j][self.n-1-i] != 0 and self.star[j][self.n-1-i-1] != 0 and self.star[j][self.n-1-i].value == self.star[j][self.n-1-i-1].value:
+                if self.star[j][self.n-1-i] != 0 and self.star[j][self.n-1-i-1] != 0 and self.star[j][self.n-1-i].value == self.star[j][self.n-1-i-1].value and (not self.star[j][self.n-1-i-1].lock):
                     return True
         return False
 
@@ -541,16 +569,21 @@ class World:
                     if self.star[i][j].charge:
                         if self.star[i][j].value <= 32:
                             self.star[i][j].value **= 2
-                        #else:
+                            self.score += (int)(math.log2(self.max)*self.star[i][j].value/4)
+                        else:
+                            self.star[i][j].value *= 2
+                            self.score += (int)(2*math.log2(self.max)*self.star[i][j].value/4)
                     else:
-                        self.star[i][j].value *= 2
+                        if self.star[i][j].value < 131072:
+                            self.star[i][j].value *= 2
+                        self.score += (int)(math.log2(self.max)*self.star[i][j].value/4)
                     self.for_del = self.star[k][l]
                     self.star[k][l] = 0
                     del self.for_del
                     return
                     
     def is_end(self):
-        return (len(self.blank_cell) == 0) and (not self.can_move())
+        return ((len(self.blank_cell) == 0) and (not self.can_move())) or self.score > 100000
 
 class Star:
     def __init__(self, x, y, sun):
