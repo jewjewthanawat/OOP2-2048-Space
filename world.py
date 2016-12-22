@@ -26,10 +26,10 @@ class World:
         self.check_blank_cell()
         self.random = 0
         self.score = 0
-        self.last_score0 = 0
-        self.last_score1 = 0
         self.max = 0
         self.count = 0
+        self.last_count0 = 0
+        self.last_count1 = 0
         self.lock_x = 0
         self.lock_y = 0
         self.sun = False
@@ -324,13 +324,13 @@ class World:
                                     self.star[i][self.n-1-j].set_vx()
                                     self.checking_cell_value = self.star[i][self.n-1-j].value
                 self.state = 6
-            elif key == arcade.key.NUM_0:
-                if (self.score - self.last_score0)/math.log2(self.max) >= 100:
-                    self.last_score0 = self.score
+            elif key == arcade.key.Z:
+                if self.count - self.last_count0 >= 25:
+                    self.last_count0 = self.count
                     self.sun = True
-            elif key == arcade.key.NUM_1:
-                if (self.score - self.last_score1)/math.log2(self.max) >= 100:
-                    self.last_score1 = self.score
+            elif key == arcade.key.X:
+                if self.count - self.last_count1 >= 25:
+                    self.last_count1 = self.count
                     for i in range(self.n):
                         for j in range(self.n):
                             if self.star[i][j] != 0 and self.star[i][j].value > 0:

@@ -1,5 +1,4 @@
 import arcade
-import math
 from world import World
 
 class WorldRenderer:
@@ -39,12 +38,12 @@ class WorldRenderer:
                 arcade.draw_texture_rectangle(self.world.black_hole.real_x2, self.world.black_hole.real_y2, self.item_texture[self.world.black_hole.type2].width, self.item_texture[self.world.black_hole.type2].height, self.item_texture[self.world.black_hole.type2], 0)
             arcade.draw_text("score", 730, 600, arcade.color.GREEN, 40, align = "center", bold = True, anchor_x = "center", anchor_y = "center")
             arcade.draw_text(str(self.world.score), 730, 550, arcade.color.GREEN, 30, align = "center", bold = True, anchor_x = "center", anchor_y = "center")
-            if (self.world.score - self.world.last_score0)/math.log2(self.world.max) >= 100:
+            if self.world.count - self.world.last_count0 >= 25:
                 arcade.draw_texture_rectangle(730, 440, self.star_texture[-3].width, self.star_texture[-3].height, self.star_texture[-3], 0)
                 arcade.draw_texture_rectangle(730, 440, self.item_texture[6].width, self.item_texture[6].height, self.item_texture[6], 0)
             else:
                 arcade.draw_texture_rectangle(730, 440, self.item_texture[4].width, self.item_texture[4].height, self.item_texture[4], 0)
-            if (self.world.score - self.world.last_score1)/math.log2(self.world.max) >= 100:
+            if self.world.count - self.world.last_count1 >= 25:
                 arcade.draw_texture_rectangle(730, 220, 100, 100, self.item_texture[3], 0)
                 arcade.draw_texture_rectangle(730, 220, self.item_texture[7].width, self.item_texture[7].height, self.item_texture[7], 0)
             else:
