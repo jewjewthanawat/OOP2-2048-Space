@@ -11,6 +11,7 @@ class World:
         self.state = 0
         self.star = []
         self.black_hole = BlackHole()
+        self.star_cell = []
         self.blank_cell = []
         self.all_star = []
         self.new_game()
@@ -25,11 +26,13 @@ class World:
         self.random = 0      
         self.max = 0
         self.count = 0
+        self.lock_x = 0
+        self.lock_y = 0
+        self.sun = False
 
     def on_key_press(self, key, key_modifiers):
         if self.state == 0: #new game
             if key == arcade.key.SPACE:
-                #reset game
                 self.new_game()
                 self.state = 1
         if self.state == 2: #ready to input
@@ -39,13 +42,51 @@ class World:
                     self.checking_cell_value = 0
                     for j in range(self.n):
                         if self.star[j][i] != 0:
-                            if self.black_hole.appear and ((self.black_hole.type1 == 1 and i == self.black_hole.x1 and j >= self.black_hole.y1) or (self.black_hole.type2 == 1 and i == self.black_hole.x2 and j >= self.black_hole.y2)):
+                            if self.star[j][i].lock:
+                                self.checking_cell_value = self.star[j][i].value
+                                self.checking_cell = j
+                                self.star[j][i].set_target_y(self.checking_cell)
+                            elif (self.black_hole.appear
+                                  and ((self.black_hole.type1 == 1 and i == self.black_hole.x1 and j >= self.black_hole.y1)
+                                       or (self.black_hole.type2 == 1 and i == self.black_hole.x2 and j >= self.black_hole.y2))):
                                 if i == self.black_hole.x1:
-                                    self.star[j][i].target = self.black_hole.real_y1
-                                    self.star[j][i].set_vy()
+                                    if i == self.lock_x and self.star[self.lock_y][i] != 0 and self.star[self.lock_y][i].lock and self.lock_y >= self.black_hole.y1 and j > self.lock_y:
+                                        if self.checking_cell_value == 0:
+                                            self.star[j][i].set_target_y(self.checking_cell)
+                                            self.star[j][i].set_vy()
+                                            self.checking_cell_value = self.star[j][i].value
+                                        elif self.checking_cell_value == self.star[j][i].value:
+                                            self.star[j][i].set_target_y(self.checking_cell)
+                                            self.star[j][i].set_vy()
+                                            self.checking_cell += 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell += 1
+                                            self.star[j][i].set_target_y(self.checking_cell)
+                                            self.star[j][i].set_vy()
+                                            self.checking_cell_value = self.star[j][i].value
+                                    else:
+                                        self.star[j][i].target = self.black_hole.real_y1
+                                        self.star[j][i].set_vy()
                                 else:
-                                    self.star[j][i].target = self.black_hole.real_y2
-                                    self.star[j][i].set_vy()
+                                    if i == self.lock_x and self.star[self.lock_y][i] != 0 and self.star[self.lock_y][i].lock and self.lock_y >= self.black_hole.y2 and j > self.lock_y:
+                                        if self.checking_cell_value == 0:
+                                            self.star[j][i].set_target_y(self.checking_cell)
+                                            self.star[j][i].set_vy()
+                                            self.checking_cell_value = self.star[j][i].value
+                                        elif self.checking_cell_value == self.star[j][i].value:
+                                            self.star[j][i].set_target_y(self.checking_cell)
+                                            self.star[j][i].set_vy()
+                                            self.checking_cell += 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell += 1
+                                            self.star[j][i].set_target_y(self.checking_cell)
+                                            self.star[j][i].set_vy()
+                                            self.checking_cell_value = self.star[j][i].value
+                                    else:
+                                        self.star[j][i].target = self.black_hole.real_y2
+                                        self.star[j][i].set_vy()
                             else:
                                 if self.checking_cell_value == 0:
                                     self.star[j][i].set_target_y(self.checking_cell)
@@ -68,13 +109,51 @@ class World:
                     self.checking_cell_value = 0
                     for j in range(self.n):
                         if self.star[self.n-1-j][i] != 0:
-                            if self.black_hole.appear and ((self.black_hole.type1 == 1 and i == self.black_hole.x1 and self.n-1-j < self.black_hole.y1) or (self.black_hole.type2 == 1 and i == self.black_hole.x2 and self.n-1-j < self.black_hole.y2)):
+                            if self.star[self.n-1-j][i].lock:
+                                self.checking_cell_value = self.star[self.n-1-j][i].value
+                                self.checking_cell = self.n-1-j
+                                self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                            elif (self.black_hole.appear
+                                  and ((self.black_hole.type1 == 1 and i == self.black_hole.x1 and self.n-1-j < self.black_hole.y1)
+                                       or (self.black_hole.type2 == 1 and i == self.black_hole.x2 and self.n-1-j < self.black_hole.y2))):
                                 if i == self.black_hole.x1:
-                                    self.star[self.n-1-j][i].target = self.black_hole.real_y1
-                                    self.star[self.n-1-j][i].set_vy()
+                                    if i == self.lock_x and self.star[self.lock_y][i] != 0 and self.star[self.lock_y][i].lock and self.lock_y < self.black_hole.y1 and self.n-1-j < self.lock_y:
+                                        if self.checking_cell_value == 0:
+                                            self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                                            self.star[self.n-1-j][i].set_vy()
+                                            self.checking_cell_value = self.star[self.n-1-j][i].value
+                                        elif self.checking_cell_value == self.star[self.n-1-j][i].value:
+                                            self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                                            self.star[self.n-1-j][i].set_vy()
+                                            self.checking_cell -= 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell -= 1
+                                            self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                                            self.star[self.n-1-j][i].set_vy()
+                                            self.checking_cell_value = self.star[self.n-1-j][i].value
+                                    else:
+                                        self.star[self.n-1-j][i].target = self.black_hole.real_y1
+                                        self.star[self.n-1-j][i].set_vy()
                                 else:
-                                    self.star[self.n-1-j][i].target = self.black_hole.real_y2
-                                    self.star[self.n-1-j][i].set_vy()
+                                    if i == self.lock_x and self.star[self.lock_y][i] != 0 and self.star[self.lock_y][i].lock and self.lock_y < self.black_hole.y2 and self.n-1-j < self.lock_y:
+                                        if self.checking_cell_value == 0:
+                                            self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                                            self.star[self.n-1-j][i].set_vy()
+                                            self.checking_cell_value = self.star[self.n-1-j][i].value
+                                        elif self.checking_cell_value == self.star[self.n-1-j][i].value:
+                                            self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                                            self.star[self.n-1-j][i].set_vy()
+                                            self.checking_cell -= 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell -= 1
+                                            self.star[self.n-1-j][i].set_target_y(self.checking_cell)
+                                            self.star[self.n-1-j][i].set_vy()
+                                            self.checking_cell_value = self.star[self.n-1-j][i].value
+                                    else:
+                                        self.star[self.n-1-j][i].target = self.black_hole.real_y2
+                                        self.star[self.n-1-j][i].set_vy()
                             else:
                                 if self.checking_cell_value == 0:
                                     self.star[self.n-1-j][i].set_target_y(self.checking_cell)
@@ -97,13 +176,51 @@ class World:
                     self.checking_cell_value = 0
                     for j in range(self.n):
                         if self.star[i][j] != 0:
-                            if self.black_hole.appear and ((self.black_hole.type1 == 0 and i == self.black_hole.y1 and j >= self.black_hole.x1) or (self.black_hole.type2 == 0 and i == self.black_hole.y2 and j >= self.black_hole.x2)):
+                            if self.star[i][j].lock:
+                                self.checking_cell_value = self.star[i][j].value
+                                self.checking_cell = j
+                                self.star[i][j].set_target_x(self.checking_cell)
+                            elif (self.black_hole.appear
+                                  and ((self.black_hole.type1 == 0 and i == self.black_hole.y1 and j >= self.black_hole.x1)
+                                       or (self.black_hole.type2 == 0 and i == self.black_hole.y2 and j >= self.black_hole.x2))):
                                 if i == self.black_hole.y1:
-                                    self.star[i][j].target = self.black_hole.real_x1
-                                    self.star[i][j].set_vx()
+                                    if i == self.lock_y and self.star[i][self.lock_x] != 0 and self.star[i][self.lock_x].lock and self.lock_x >= self.black_hole.x1 and j > self.lock_x:
+                                        if self.checking_cell_value == 0:
+                                            self.star[i][j].set_target_x(self.checking_cell)
+                                            self.star[i][j].set_vx()
+                                            self.checking_cell_value = self.star[i][j].value
+                                        elif self.checking_cell_value == self.star[i][j].value:
+                                            self.star[i][j].set_target_x(self.checking_cell)
+                                            self.star[i][j].set_vx()
+                                            self.checking_cell += 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell += 1
+                                            self.star[i][j].set_target_x(self.checking_cell)
+                                            self.star[i][j].set_vx()
+                                            self.checking_cell_value = self.star[i][j].value
+                                    else:
+                                        self.star[i][j].target = self.black_hole.real_x1
+                                        self.star[i][j].set_vx()
                                 else:
-                                    self.star[i][j].target = self.black_hole.real_x2
-                                    self.star[i][j].set_vx()
+                                    if i == self.lock_y and self.star[i][self.lock_x] != 0 and self.star[i][self.lock_x].lock and self.lock_x >= self.black_hole.x2 and j > self.lock_x:
+                                        if self.checking_cell_value == 0:
+                                            self.star[i][j].set_target_x(self.checking_cell)
+                                            self.star[i][j].set_vx()
+                                            self.checking_cell_value = self.star[i][j].value
+                                        elif self.checking_cell_value == self.star[i][j].value:
+                                            self.star[i][j].set_target_x(self.checking_cell)
+                                            self.star[i][j].set_vx()
+                                            self.checking_cell += 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell += 1
+                                            self.star[i][j].set_target_x(self.checking_cell)
+                                            self.star[i][j].set_vx()
+                                            self.checking_cell_value = self.star[i][j].value
+                                    else:
+                                        self.star[i][j].target = self.black_hole.real_x2
+                                        self.star[i][j].set_vx()
                             else:
                                 if self.checking_cell_value == 0:
                                     self.star[i][j].set_target_x(self.checking_cell)
@@ -126,13 +243,51 @@ class World:
                     self.checking_cell_value = 0
                     for j in range(self.n):
                         if self.star[i][self.n-1-j] != 0:
-                            if self.black_hole.appear and ((self.black_hole.type1 == 0 and i == self.black_hole.y1 and self.n-1-j < self.black_hole.x1) or (self.black_hole.type2 == 0 and i == self.black_hole.y2 and self.n-1-j < self.black_hole.x2)):
+                            if self.star[i][self.n-1-j].lock:
+                                self.checking_cell_value = self.star[i][self.n-1-j].value
+                                self.checking_cell = self.n-1-j
+                                self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                            elif (self.black_hole.appear
+                                  and ((self.black_hole.type1 == 0 and i == self.black_hole.y1 and self.n-1-j < self.black_hole.x1)
+                                       or (self.black_hole.type2 == 0 and i == self.black_hole.y2 and self.n-1-j < self.black_hole.x2))):
                                 if i == self.black_hole.y1:
-                                    self.star[i][self.n-1-j].target = self.black_hole.real_x1
-                                    self.star[i][self.n-1-j].set_vx()
+                                    if i == self.lock_y and self.star[i][self.lock_x] != 0 and self.star[i][self.lock_x].lock and self.lock_x < self.black_hole.x2 and self.n-1-j < self.lock_x:
+                                        if self.checking_cell_value == 0:
+                                            self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                                            self.star[i][self.n-1-j].set_vx()
+                                            self.checking_cell_value = self.star[i][self.n-1-j].value
+                                        elif self.checking_cell_value == self.star[i][self.n-1-j].value:
+                                            self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                                            self.star[i][self.n-1-j].set_vx()
+                                            self.checking_cell -= 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell -= 1
+                                            self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                                            self.star[i][self.n-1-j].set_vx()
+                                            self.checking_cell_value = self.star[i][self.n-1-j].value
+                                    else:
+                                        self.star[i][self.n-1-j].target = self.black_hole.real_x1
+                                        self.star[i][self.n-1-j].set_vx()
                                 else:
-                                    self.star[i][self.n-1-j].target = self.black_hole.real_x2
-                                    self.star[i][self.n-1-j].set_vx()
+                                    if i == self.lock_y and self.star[i][self.lock_x] != 0 and self.star[i][self.lock_x].lock and self.lock_x < self.black_hole.x2 and self.n-1-j < self.lock_x:
+                                        if self.checking_cell_value == 0:
+                                            self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                                            self.star[i][self.n-1-j].set_vx()
+                                            self.checking_cell_value = self.star[i][self.n-1-j].value
+                                        elif self.checking_cell_value == self.star[i][self.n-1-j].value:
+                                            self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                                            self.star[i][self.n-1-j].set_vx()
+                                            self.checking_cell -= 1
+                                            self.checking_cell_value = 0
+                                        else:
+                                            self.checking_cell -= 1
+                                            self.star[i][self.n-1-j].set_target_x(self.checking_cell)
+                                            self.star[i][self.n-1-j].set_vx()
+                                            self.checking_cell_value = self.star[i][self.n-1-j].value
+                                    else:
+                                        self.star[i][self.n-1-j].target = self.black_hole.real_x2
+                                        self.star[i][self.n-1-j].set_vx()
                             else:
                                 if self.checking_cell_value == 0:
                                     self.star[i][self.n-1-j].set_target_x(self.checking_cell)
@@ -149,13 +304,24 @@ class World:
                                     self.star[i][self.n-1-j].set_vx()
                                     self.checking_cell_value = self.star[i][self.n-1-j].value
                 self.state = 6
+            elif key == arcade.key.NUM_0:
+                self.sun = True
+            elif key == arcade.key.NUM_1:
+                for i in range(self.n):
+                    for j in range(self.n):
+                        if self.star[i][j] != 0 and self.star[i][j].value > 0:
+                            self.star[i][j].charge = True
  
     def animate(self, delta):
         if self.state == 1: #gen star
             arcade.pause(0.1)
-            self.random = randint(0,len(self.blank_cell)-1)
-            self.star[math.floor(self.blank_cell[self.random]/self.n)][self.blank_cell[self.random]%self.n] = Star(105+150*(self.blank_cell[self.random]%self.n), 555-150*math.floor(self.blank_cell[self.random]/self.n))
-            self.check_blank_cell()
+            if self.count % 6 == 0 and len(self.star_cell) > 0:
+                self.random = randint(0,len(self.star_cell)-1)
+                self.lock_x = self.star_cell[self.random]%self.n
+                self.lock_y = math.floor(self.star_cell[self.random]/self.n)
+                self.star[self.lock_y][self.lock_x].lock = True
+            elif self.star[self.lock_y][self.lock_x] != 0:
+                self.star[self.lock_y][self.lock_x].lock = False
             if self.count % 10 == 0 and self.count != 0:
                 self.black_hole.appear = True
                 self.black_hole.type1 = randint(0,1)
@@ -185,11 +351,27 @@ class World:
                         self.black_hole.y2 = randint(0,3)
                     else:
                         self.black_hole.x2 = randint(0,3)
-                        self.black_hole.y2 = randint(0,4)
-                    
+                        self.black_hole.y2 = randint(0,4)                    
                 self.black_hole.set_position()
             else:
                 self.black_hole.appear = False
+            self.random = randint(0,len(self.blank_cell)-1)
+            self.star[math.floor(self.blank_cell[self.random]/self.n)][self.blank_cell[self.random]%self.n] = Star(105+150*(self.blank_cell[self.random]%self.n), 555-150*math.floor(self.blank_cell[self.random]/self.n), self.sun)
+            self.sun = False
+            for i in range(self.n):
+                for j in range(self.n):
+                    if self.star[i][j] != 0 and self.star[i][j].value == -1:                        
+                        arcade.pause(0.5)
+                        self.for_del = self.star[i][j]
+                        self.star[i][j] = 0
+                        del self.for_del
+                        for k in range(self.n):
+                            if self.star[i][k] != 0 and self.star[i][k].value > 0:
+                                self.star[i][k].value *= 2
+                            if self.star[k][j] != 0 and self.star[k][j].value > 0:
+                                self.star[k][j].value *= 2
+            self.check_max()
+            self.check_blank_cell()
             if self.is_end():
                 self.state = 0
             else:
@@ -237,11 +419,14 @@ class World:
                         
 
     def check_blank_cell(self):
+        self.star_cell.clear()
         self.blank_cell.clear()
         for i in range(self.n):
             for j in range(self.n):
                 if self.star[i][j] == 0:
                     self.blank_cell.append(self.n*i+j)
+                else:
+                    self.star_cell.append(self.n*i+j)
 
     def check_max(self):
         self.max = 0
@@ -249,7 +434,6 @@ class World:
             for j in range(self.n):
                 if self.star[i][j] != 0 and self.star[i][j].value > self.max:
                     self.max = self.star[i][j].value
-        print(self.max)
 
     def can_move_up(self):
         if self.black_hole.appear and ((self.black_hole.type1 == 1 and self.black_hole.y1 != 4) or (self.black_hole.type2 == 1 and self.black_hole.y2 != 4)):
@@ -322,17 +506,29 @@ class World:
         for i in range(self.n):
             for j in range(self.n):
                 if self.star[i][j] != 0:
-                    self.merge_cell(i, j)
+                    if self.star[i][j].value < 0:
+                        self.star[i][j].value += 1 
+                    else:
+                        self.merge_cell(i, j)
         self.all_star.clear()
         for i in range(self.n):
             for j in range(self.n):
                 if self.star[i][j] != 0:
+                    self.star[i][j].charge = False
                     self.all_star.append(self.star[i][j])
                     self.for_del = self.star[i][j]
                     self.star[i][j] = 0
                     del self.for_del
         for i in range(len(self.all_star)):
             self.star[(int)((555 - self.all_star[i].y)/150)][(int)((self.all_star[i].x - 105)/150)] = self.all_star[i]
+        for i in range(self.n):
+            for j in range(self.n):
+                if self.star[i][j] != 0 and self.star[i][j].value == -1:                        
+                    for k in range(self.n):
+                        if self.star[i][k] != 0 and self.star[i][k].value > 0:
+                            self.star[i][k].charge = True
+                        if self.star[k][j] != 0 and self.star[k][j].value > 0:
+                            self.star[k][j].charge = True
         self.check_max()
         self.check_blank_cell()
         self.count += 1
@@ -342,7 +538,12 @@ class World:
         for k in range(self.n):
             for l in range(self.n):
                 if self.star[k][l] != 0 and (k != i or l != j) and self.star[k][l].x == self.star[i][j].x and self.star[k][l].y == self.star[i][j].y:
-                    self.star[i][j].value *= 2
+                    if self.star[i][j].charge:
+                        if self.star[i][j].value <= 32:
+                            self.star[i][j].value **= 2
+                        #else:
+                    else:
+                        self.star[i][j].value *= 2
                     self.for_del = self.star[k][l]
                     self.star[k][l] = 0
                     del self.for_del
@@ -352,15 +553,20 @@ class World:
         return (len(self.blank_cell) == 0) and (not self.can_move())
 
 class Star:
-    def __init__(self, x, y):
+    def __init__(self, x, y, sun):
         self.x = x
         self.y = y
         self.target = -1
         self.v = 0
-        if randint(1,4) == 4:
-            self.value = 4
+        self.lock = False
+        self.charge = False
+        if sun:
+            self.value = -3
         else:
-            self.value = 2
+            if randint(1,4) == 4:
+                self.value = 4
+            else:
+                self.value = 2
 
     def set_vx(self):
         self.v = (self.target - self.x)/5
