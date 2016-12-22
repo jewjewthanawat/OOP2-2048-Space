@@ -25,8 +25,8 @@ class WorldRenderer:
                     arcade.draw_texture_rectangle(self.world.star[i][j].x, self.world.star[i][j].y, self.star_texture[self.world.star[i][j].value].width, self.star_texture[self.world.star[i][j].value].height, self.star_texture[self.world.star[i][j].value], 0)
                     #arcade.draw_text(str(self.world.star[i][j].value), self.world.star[i][j].x, self.world.star[i][j].y, arcade.color.BLACK, font_size=40, bold=True, align="center", anchor_x="center", anchor_y="center")
         if self.world.black_hole.appear:
-            arcade.draw_texture_rectangle(self.world.black_hole.real_x1, self.world.black_hole.real_y1, self.item_texture[self.world.black_hole.type].width, self.item_texture[self.world.black_hole.type].height, self.item_texture[self.world.black_hole.type], 0)
-            arcade.draw_texture_rectangle(self.world.black_hole.real_x2, self.world.black_hole.real_y2, self.item_texture[self.world.black_hole.type].width, self.item_texture[self.world.black_hole.type].height, self.item_texture[self.world.black_hole.type], 0)
+            arcade.draw_texture_rectangle(self.world.black_hole.real_x1, self.world.black_hole.real_y1, self.item_texture[self.world.black_hole.type1].width, self.item_texture[self.world.black_hole.type1].height, self.item_texture[self.world.black_hole.type1], 0)
+            arcade.draw_texture_rectangle(self.world.black_hole.real_x2, self.world.black_hole.real_y2, self.item_texture[self.world.black_hole.type2].width, self.item_texture[self.world.black_hole.type2].height, self.item_texture[self.world.black_hole.type2], 0)
             
     def set_asset(self):
         self.background = []
