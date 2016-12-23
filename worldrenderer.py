@@ -48,8 +48,13 @@ class WorldRenderer:
                 arcade.draw_texture_rectangle(730, 220, self.item_texture[7].width, self.item_texture[7].height, self.item_texture[7], 0)
             else:
                 arcade.draw_texture_rectangle(730, 220, 100, 100, self.item_texture[5], 0)
-            if self.world.state == 0:
-                arcade.draw_texture_rectangle(330, 330, self.item_texture[9].width, self.item_texture[9].height, self.item_texture[9], 0)
+            if self.world.state == 0 or self.world.state == 7 or self.world.state == 8:
+                if self.world.state == 0:
+                    arcade.draw_texture_rectangle(330, 330, self.item_texture[9].width, self.item_texture[9].height, self.item_texture[9], 0)
+                elif self.world.state == 7:
+                    arcade.draw_texture_rectangle(330, 330, self.item_texture[11].width, self.item_texture[11].height, self.item_texture[11], 0)
+                else:
+                    arcade.draw_texture_rectangle(330, 330, self.item_texture[12].width, self.item_texture[12].height, self.item_texture[12], 0)
                 arcade.draw_text("your score : "+(str)(self.world.score)+"    your max star value :"+(str)(self.world.max), 330, 410, arcade.color.GREEN, 20, align = "center", bold = True, anchor_x = "center", anchor_y = "center")
                 if self.world.tutorial:
                     arcade.draw_texture_rectangle(400, 330, self.item_texture[10].width, self.item_texture[10].height, self.item_texture[10], 0)
@@ -81,3 +86,5 @@ class WorldRenderer:
         self.item_texture[8] = arcade.load_texture('asset/first.png')
         self.item_texture[9] = arcade.load_texture('asset/over.png')
         self.item_texture[10] = arcade.load_texture('asset/tutorial.png')
+        self.item_texture[11] = arcade.load_texture('asset/pause.png')
+        self.item_texture[12] = arcade.load_texture('asset/win.png')

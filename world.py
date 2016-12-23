@@ -10,6 +10,7 @@ class World:
         self.n = 4
         self.state = -1
         self.tutorial = False
+        self.is_finish = False
         self.max = 2049
         self.star = []
         self.black_hole = BlackHole()
@@ -33,6 +34,7 @@ class World:
         self.lock_x = 0
         self.lock_y = 0
         self.sun = False
+        self.is_finish = False
 
     def on_key_press(self, key, key_modifiers):
         if self.state == -1: #first page
@@ -45,7 +47,7 @@ class World:
                     self.tutorial = False
                 else:
                     self.tutorial = True
-        if self.state == 0: #end game
+        elif self.state == 0: #end game
             if key == arcade.key.SPACE:
                 self.tutorial = False
                 self.new_game()
@@ -55,7 +57,7 @@ class World:
                     self.tutorial = False
                 else:
                     self.tutorial = True
-        if self.state == 2: #ready to input
+        elif self.state == 2: #ready to input
             if key == arcade.key.UP and self.can_move_up():
                 for i in range(self.n):
                     self.checking_cell = 0
@@ -335,6 +337,28 @@ class World:
                         for j in range(self.n):
                             if self.star[i][j] != 0 and self.star[i][j].value > 0:
                                 self.star[i][j].charge = True
+        elif self.state == 7:
+            if key == arcade.key.SPACE:
+                self.tutorial = False
+                self.new_game()
+                self.state = 1
+            elif key == arcade.key.K:
+                self.state = 2
+            elif key == arcade.key.H:
+                if self.tutorial:
+                    self.tutorial = False
+                else:
+                    self.tutorial = True
+        elif self.state == 8:
+            if key == arcade.key.SPACE:
+                self.tutorial = False
+                self.new_game()
+                self.state = 1
+            elif key == arcade.key.H:
+                if self.tutorial:
+                    self.tutorial = False
+                else:
+                    self.tutorial = True
  
     def animate(self, delta):
         if self.state == 1: #gen star
@@ -402,6 +426,11 @@ class World:
             self.check_blank_cell()
             if self.is_end():
                 self.state = 0
+            elif (not self.is_finish) and self.max == 2048:
+                self.is_finish = True
+                self.state = 7
+            elif self.score > 100000:
+                self.state = 8
             else:
                 self.state = 2
         elif self.state == 3: #animate move up
@@ -464,8 +493,14 @@ class World:
                     self.max = self.star[i][j].value
 
     def can_move_up(self):
-        if self.black_hole.appear and ((self.black_hole.type1 == 1 and self.black_hole.y1 != 4) or (self.black_hole.type2 == 1 and self.black_hole.y2 != 4)):
-            return True
+        if self.black_hole.appear and self.black_hole.type1 == 1 and self.black_hole.y1 != 4:
+            for i in range(self.n-self.black_hole.y1):
+                if self.star[self.n-1-i][self.black_hole.x1] != 0:
+                    return True
+        if self.black_hole.appear and self.black_hole.type2 == 1 and self.black_hole.y2 != 4:
+            for i in range(self.n-self.black_hole.y2):
+                if self.star[self.n-1-i][self.black_hole.x2] != 0:
+                    return True
         for i in range(self.n-1):
             for j in range(self.n):
                 if self.star[self.n-1-i-1][j] == 0 and self.star[self.n-1-i][j] != 0 and (not self.star[self.n-1-i][j].lock):
@@ -475,8 +510,14 @@ class World:
         return False
 
     def can_move_down(self):
-        if self.black_hole.appear and ((self.black_hole.type1 == 1 and self.black_hole.y1 != 0) or (self.black_hole.type2 == 1 and self.black_hole.y2 != 0)):
-            return True
+        if self.black_hole.appear and self.black_hole.type1 == 1 and self.black_hole.y1 != 0:
+            for i in range(self.black_hole.y1):
+                if self.star[i][self.black_hole.x1] != 0:
+                    return True
+        if self.black_hole.appear and self.black_hole.type2 == 1 and self.black_hole.y2 != 0:
+            for i in range(self.black_hole.y2):
+                if self.star[i][self.black_hole.x2] != 0:
+                    return True
         for i in range(self.n-1):
             for j in range(self.n):
                 if self.star[i+1][j] == 0 and self.star[i][j] != 0 and (not self.star[i][j].lock):
@@ -486,8 +527,14 @@ class World:
         return False
 
     def can_move_left(self):
-        if self.black_hole.appear and ((self.black_hole.type1 == 0 and self.black_hole.x1 != 4) or (self.black_hole.type2 == 0 and self.black_hole.x2 != 4)):
-            return True
+        if self.black_hole.appear and self.black_hole.type1 == 0 and self.black_hole.x1 != 4:
+            for i in range(self.black_hole.x1):
+                if self.star[self.black_hole.y1][i] != 0:
+                    return True
+        if self.black_hole.appear and self.black_hole.type2 == 0 and self.black_hole.x2 != 4:
+            for i in range(self.black_hole.x2):
+                if self.star[self.black_hole.y2][i] != 0:
+                    return True
         for i in range(self.n-1):
             for j in range(self.n):
                 if self.star[j][i] == 0 and self.star[j][i+1] != 0 and (not self.star[j][i+1].lock):
@@ -497,8 +544,14 @@ class World:
         return False
 
     def can_move_right(self):
-        if self.black_hole.appear and ((self.black_hole.type1 == 0 and self.black_hole.x1 != 0) or (self.black_hole.type2 == 0 and self.black_hole.x2 != 0)):
-            return True
+        if self.black_hole.appear and self.black_hole.type1 == 0 and self.black_hole.x1 != 0:
+            for i in range(self.n-self.black_hole.x1):
+                if self.star[self.black_hole.y1][self.n-1-i] != 0:
+                    return True
+        if self.black_hole.appear and self.black_hole.type2 == 0 and self.black_hole.x2 != 0:
+            for i in range(self.n-self.black_hole.x2):
+                if self.star[self.black_hole.y2][self.n-1-i] != 0:
+                    return True
         for i in range(self.n-1):
             for j in range(self.n):
                 if self.star[j][self.n-1-i] == 0 and self.star[j][self.n-1-i-1] != 0 and (not self.star[j][self.n-1-i-1].lock):
