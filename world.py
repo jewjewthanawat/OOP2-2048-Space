@@ -636,7 +636,7 @@ class World:
                     return
                     
     def is_end(self):
-        return ((len(self.blank_cell) == 0) and (not self.can_move())) or self.score > 100000
+        return ((len(self.blank_cell) == 0) and (not self.can_move()))
 
 class Star:
     def __init__(self, x, y, sun):
